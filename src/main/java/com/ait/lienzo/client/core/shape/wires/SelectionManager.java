@@ -709,19 +709,21 @@ public class SelectionManager implements NodeMouseDoubleClickHandler, NodeMouseC
                             if (m_connectors.contains(wiresConnector) && m_externallyConnected.contains(wiresConnector))
                             {
                                 WiresConnection otherConnection =  connection.getOppositeConnection();
-                                if (otherConnection != null && otherConnection.getMagnet() != null)
+                                if (otherConnection != null)
                                 {
-                                    WiresShape otherShape = otherConnection.getMagnet().getMagnets().getWiresShape();
-                                    if (findParentIfInSelection(otherShape) != null)
+                                    if (otherConnection.getMagnet() == null)
                                     {
                                         m_externallyConnected.remove(wiresConnector);
                                     }
+                                    else
+                                    {
+                                        WiresShape otherShape = otherConnection.getMagnet().getMagnets().getWiresShape();
+                                        if (findParentIfInSelection(otherShape) != null)
+                                        {
+                                            m_externallyConnected.remove(wiresConnector);
+                                        }
+                                    }
                                 }
-                                else if (otherConnection.getMagnet() == null)
-                                {
-                                    m_externallyConnected.remove(wiresConnector);
-                                }
-
                             }
                         }
                     }
@@ -904,8 +906,6 @@ public class SelectionManager implements NodeMouseDoubleClickHandler, NodeMouseC
         m_selected.setSelectionGroup(true);
         BoundingBox box = m_selected.getBoundingBox();
 
-        BoundingBox      nodeBox    = null;
-        List<WiresShape> shapesList = new ArrayList<WiresShape>();
         List<WiresShape> toBeRemoved = new ArrayList<WiresShape>();
 
         Map<String, WiresShape> shapesMap = new HashMap<String, WiresShape>();
@@ -919,10 +919,9 @@ public class SelectionManager implements NodeMouseDoubleClickHandler, NodeMouseC
                 // docked items cannot be added to a selection, only their parent they are docked to
                 continue;
             }
-            nodeBox = shape.getContainer().getComputedBoundingPoints().getBoundingBox();
+            BoundingBox nodeBox = shape.getContainer().getComputedBoundingPoints().getBoundingBox();
             if (selectionBox.intersects(nodeBox))
             {
-                shapesList.add(shape);
                 shapesMap.put(shape.getContainer().uuid(), shape);
                 uuidMap.put(shape.getContainer().uuid(), nodeBox);
             }
@@ -945,7 +944,7 @@ public class SelectionManager implements NodeMouseDoubleClickHandler, NodeMouseC
 
         for (WiresShape shape : shapesMap.values())
         {
-            nodeBox = uuidMap.get(shape.getContainer().uuid());
+            BoundingBox nodeBox = uuidMap.get(shape.getContainer().uuid());
             m_selected.add(shape);
             box.add(nodeBox);
         }
@@ -962,7 +961,7 @@ public class SelectionManager implements NodeMouseDoubleClickHandler, NodeMouseC
             points.push(loc.getX() + boundingBox.getWidth(), loc.getY() + boundingBox.getHeight() );
             points.push(loc.getX(), loc.getY() + boundingBox.getHeight() );
 
-            nodeBox = connector.getGroup().getComputedBoundingPoints().getBoundingBox();
+            BoundingBox nodeBox = connector.getGroup().getComputedBoundingPoints().getBoundingBox();
             if (selectionBox.contains(nodeBox))
             {
                 addConnector(connector, externallyConnected, box, nodeBox);
