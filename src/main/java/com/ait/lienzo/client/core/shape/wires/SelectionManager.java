@@ -119,10 +119,6 @@ public class SelectionManager implements NodeMouseDoubleClickHandler, NodeMouseC
 
     private       Point2D              m_start;
 
-    private       HandlerRegistration  m_dragSelectionStartReg;
-
-    private       HandlerRegistration  m_dragSelectionMoveReg;
-
     private       HandlerRegistration  m_dragSelectionEndReg;
 
     private       HandlerRegistration  m_dragSelectionMouseClickReg;
@@ -1068,17 +1064,14 @@ public class SelectionManager implements NodeMouseDoubleClickHandler, NodeMouseC
     {
         if (getSelectionShape() != null )
         {
-            if (m_dragSelectionStartReg != null)
+            if (m_dragSelectionEndReg != null)
             {
-                // this is not added for the selection creation rectangle.
-                m_dragSelectionStartReg.removeHandler();
-                m_dragSelectionMoveReg.removeHandler();
                 m_dragSelectionEndReg.removeHandler();
-                m_dragSelectionMouseClickReg.removeHandler();
-
-                m_dragSelectionStartReg = null;
-                m_dragSelectionMoveReg = null;
                 m_dragSelectionEndReg = null;
+            }
+            if (m_dragSelectionMouseClickReg != null)
+            {
+                m_dragSelectionMouseClickReg.removeHandler();
                 m_dragSelectionMouseClickReg = null;
             }
             m_selectionShapeProvider.clear();
