@@ -9,6 +9,7 @@ import com.ait.lienzo.client.core.shape.wires.handlers.WiresMouseControl;
 import com.ait.lienzo.client.core.shape.wires.handlers.WiresParentPickerControl;
 import com.ait.lienzo.client.core.shape.wires.picker.ColorMapBackedPicker;
 import com.ait.lienzo.client.core.types.Point2D;
+import com.google.gwt.core.client.GWT;
 
 public class WiresParentPickerControlImpl implements WiresParentPickerControl,
                                                      WiresMouseControl {
@@ -72,6 +73,7 @@ public class WiresParentPickerControlImpl implements WiresParentPickerControl,
     @Override
     public boolean onMove(double dx,
                           double dy) {
+        GWT.log("On Move X=" + dx + " Y=" + dy);
         if (!shapeLocationControl.onMove(dx, dy)) {
             final Point2D currentLocation = getCurrentLocation();
             final double x = currentLocation.getX();

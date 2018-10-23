@@ -23,6 +23,7 @@ import java.util.Collection;
 import com.ait.lienzo.client.core.event.NodeDragEndEvent;
 import com.ait.lienzo.client.core.event.NodeDragEndHandler;
 import com.ait.lienzo.client.core.shape.Layer;
+import com.ait.lienzo.client.core.shape.Shape;
 import com.ait.lienzo.client.core.shape.wires.event.WiresResizeEndEvent;
 import com.ait.lienzo.client.core.shape.wires.event.WiresResizeEndHandler;
 import com.ait.lienzo.client.core.shape.wires.event.WiresResizeStartEvent;
@@ -284,7 +285,9 @@ public final class WiresManager
         m_registrationManager.register(connector.getGroup().addNodeDragEndHandler(handler));
 
         m_registrationManager.register(connector.getLine().addNodeMouseClickHandler(handler));
-        m_registrationManager.register(getLayer().getLayer().addNodeMouseMoveHandler(handler));
+        m_registrationManager.register(connector.getLine().addNodeMouseEnterHandler(handler));
+        m_registrationManager.register(connector.getLine().addNodeMouseExitHandler(handler));
+        m_registrationManager.register(connector.getLine().addNodeMouseMoveHandler(handler));
 
         m_registrationManager.register(connector.getHead().addNodeMouseClickHandler(handler));
         m_registrationManager.register(connector.getTail().addNodeMouseClickHandler(handler));
@@ -292,6 +295,7 @@ public final class WiresManager
         //increase the selection area
         connector.getLine().getAttributes().setSelectionStrokeOffset(CONNECTOR_SELECTION_OFFSET);
         connector.getLine().getAttributes().setSelectionBoundsOffset(CONNECTOR_SELECTION_OFFSET);
+        ((Shape) connector.getLine()).setSelectionStrokeOffset(50);
 
         getConnectorList().add(connector);
         m_shapeHandlersMap.put(uuid, m_registrationManager);

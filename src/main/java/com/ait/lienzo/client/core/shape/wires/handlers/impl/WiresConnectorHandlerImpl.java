@@ -1,18 +1,21 @@
 package com.ait.lienzo.client.core.shape.wires.handlers.impl;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
 
 import com.ait.lienzo.client.core.event.NodeDragEndEvent;
 import com.ait.lienzo.client.core.event.NodeDragMoveEvent;
 import com.ait.lienzo.client.core.event.NodeDragStartEvent;
 import com.ait.lienzo.client.core.event.NodeMouseClickEvent;
+import com.ait.lienzo.client.core.event.NodeMouseEnterEvent;
+import com.ait.lienzo.client.core.event.NodeMouseExitEvent;
 import com.ait.lienzo.client.core.event.NodeMouseMoveEvent;
+import com.ait.lienzo.client.core.event.NodeMouseOutEvent;
+import com.ait.lienzo.client.core.event.NodeMouseOverEvent;
 import com.ait.lienzo.client.core.shape.Shape;
 import com.ait.lienzo.client.core.shape.wires.WiresConnector;
 import com.ait.lienzo.client.core.shape.wires.WiresManager;
 import com.ait.lienzo.client.core.shape.wires.handlers.WiresConnectorControl;
 import com.ait.lienzo.client.core.shape.wires.handlers.WiresConnectorHandler;
-import com.ait.lienzo.client.core.types.BoundingPoints;
 import com.ait.lienzo.client.core.types.Point2D;
 import com.ait.lienzo.client.core.types.Point2DArray;
 import com.ait.lienzo.client.core.util.Geometry;
@@ -32,7 +35,33 @@ public class WiresConnectorHandlerImpl implements WiresConnectorHandler {
     private boolean ownToken;
 
     //Token to control the concurrency between connectors when creating transient control handle
-    private static ConcurrentHashMap<String, Boolean> transientControlHandleTokenMap = new ConcurrentHashMap<>();
+    private static HashMap<String, Boolean> transientControlHandleTokenMap = new HashMap<>();
+
+    @Override
+    public void onNodeMouseEnter(NodeMouseEnterEvent event) {
+        if (!isSelected()) {
+            getControl().showControlPoints();
+        }
+
+    }
+
+    @Override
+    public void onNodeMouseExit(NodeMouseExitEvent event) {
+        if (!isSelected()) {
+            getControl().hideControlPoints();
+            destroyTransientControlHandle();
+        }
+    }
+
+    @Override
+    public void onNodeMouseOut(NodeMouseOutEvent event) {
+        mouseMove(event.getX(), event.getY());
+    }
+
+    @Override
+    public void onNodeMouseOver(NodeMouseOverEvent event) {
+        mouseMove(event.getX(), event.getY());
+    }
 
     public static class Event {
 
@@ -173,26 +202,17 @@ public class WiresConnectorHandlerImpl implements WiresConnectorHandler {
 
     @Override
     public void onNodeMouseMove(final NodeMouseMoveEvent event) {
-        if (!getConnector().getLine().isControlPointShape()) {
-            //skipping in case the connector is not a control point shape
-            return;
-        }
+        mouseMove(event.getX(), event.getY());
+    }
 
-        if (!isOverConnector(event.getX(), event.getY())) {
-            destroyTransientControlHandle();
+    private void mouseMove(int x, int y)
+    {
+        if (!tryGetToken()) {
             return;
-        }
-
-        if (!isSelected()) {
-            getControl().showControlPoints();
         }
 
         final Point2DArray linePoints = getConnector().getLine().getPoint2DArray();
-        final Point2D closestPoint = Geometry.findClosestPointOnLine(event.getX(), event.getY(), linePoints);
-        if (closestPoint == null) {
-            destroyTransientControlHandle();
-            return;
-        }
+        final Point2D closestPoint = Geometry.findClosestPointOnLine(x, y, linePoints);
 
         //check it the closest point is overlapping or it is very close to any line point
         for (int i = 0; i < linePoints.size(); i++) {
@@ -201,13 +221,6 @@ public class WiresConnectorHandlerImpl implements WiresConnectorHandler {
                 destroyTransientControlHandle(false);
                 return;
             }
-        }
-
-        //check if the closest point is too far from the current mouse location
-        double distance = Geometry.distance(event.getX(), event.getY(), closestPoint.getX(), closestPoint.getY());
-        if (distance > R1) {
-            destroyTransientControlHandle();
-            return;
         }
 
         Shape<?> transientControlHandle = getControl().getTransientControlHandle();
@@ -252,29 +265,13 @@ public class WiresConnectorHandlerImpl implements WiresConnectorHandler {
         return getWiresManager().getLayer().getLayer().uuid();
     }
 
-    private boolean isOverConnector(double x, double y) {
-        //skip in case the token was not gotten
-        if (!tryGetToken()) {
-            return false;
-        }
-        //check if the connector is already selected
-        if (isSelected()) {
-            return true;
-        }
-        //check if the mouse is within the connector bounding box area
-        final BoundingPoints computedBoundingPoints = getConnector().getLine().getComputedBoundingPoints();
-        final Point2D a0 = new Point2D(computedBoundingPoints.getBoundingBox().getX(), computedBoundingPoints.getBoundingBox().getY());
-        final Point2D a1 = new Point2D(computedBoundingPoints.getBoundingBox().getMaxX(), computedBoundingPoints.getBoundingBox().getMaxY());
-        return Geometry.intersectPointWithinBounding(new Point2D(x, y), a0, a1);
-    }
-
     private boolean tryGetToken() {
         //check and get the token of the transient control handle, concurrency between connectors
         final String layerID = getLayerID();
         if(layerID == null){
             return true;
         }
-        final Boolean gotToken = transientControlHandleTokenMap.putIfAbsent(layerID, Boolean.TRUE);
+        final Boolean gotToken = transientControlHandleTokenMap.get(layerID);
         if(gotToken == null){
             this.ownToken = true;
         }
