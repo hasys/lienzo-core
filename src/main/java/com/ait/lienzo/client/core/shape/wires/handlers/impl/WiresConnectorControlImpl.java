@@ -3,9 +3,6 @@ package com.ait.lienzo.client.core.shape.wires.handlers.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import com.ait.lienzo.client.core.animation.AnimationProperties;
-import com.ait.lienzo.client.core.animation.AnimationProperty;
-import com.ait.lienzo.client.core.animation.AnimationTweener;
 import com.ait.lienzo.client.core.event.NodeDragEndEvent;
 import com.ait.lienzo.client.core.event.NodeDragEndHandler;
 import com.ait.lienzo.client.core.event.NodeDragStartEvent;
@@ -41,7 +38,6 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Timer;
 
 import static com.ait.lienzo.client.core.shape.AbstractMultiPointShape.DefaultMultiPointShapeHandleFactory.R0;
-import static com.ait.lienzo.client.core.shape.AbstractMultiPointShape.DefaultMultiPointShapeHandleFactory.R1;
 import static com.ait.lienzo.client.core.shape.AbstractMultiPointShape.DefaultMultiPointShapeHandleFactory.SELECTION_OFFSET;
 
 /**
@@ -512,7 +508,7 @@ public class WiresConnectorControlImpl implements WiresConnectorControl {
         }));
 
         //add the shape on the connector line
-        m_connector.getLine().getLayer().add(pointHandleShape);
+        m_connector.getGroup().add(pointHandleShape);
 
         this.transientControlHandle = pointHandleShape;
         return pointHandleShape;

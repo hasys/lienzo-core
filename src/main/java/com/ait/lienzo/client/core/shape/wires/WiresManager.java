@@ -283,10 +283,10 @@ public final class WiresManager
         m_registrationManager.register(connector.getGroup().addNodeDragStartHandler(handler));
         m_registrationManager.register(connector.getGroup().addNodeDragMoveHandler(handler));
         m_registrationManager.register(connector.getGroup().addNodeDragEndHandler(handler));
+        m_registrationManager.register(connector.getGroup().addNodeMouseEnterHandler(handler));
+        m_registrationManager.register(connector.getGroup().addNodeMouseExitHandler(handler));
 
         m_registrationManager.register(connector.getLine().addNodeMouseClickHandler(handler));
-        m_registrationManager.register(connector.getLine().addNodeMouseEnterHandler(handler));
-        m_registrationManager.register(connector.getLine().addNodeMouseExitHandler(handler));
         m_registrationManager.register(connector.getLine().addNodeMouseMoveHandler(handler));
 
         m_registrationManager.register(connector.getHead().addNodeMouseClickHandler(handler));
