@@ -30,6 +30,10 @@ import com.ait.lienzo.client.core.event.NodeDragMoveEvent;
 import com.ait.lienzo.client.core.event.NodeDragMoveHandler;
 import com.ait.lienzo.client.core.event.NodeDragStartEvent;
 import com.ait.lienzo.client.core.event.NodeDragStartHandler;
+import com.ait.lienzo.client.core.event.NodeMouseEnterEvent;
+import com.ait.lienzo.client.core.event.NodeMouseEnterHandler;
+import com.ait.lienzo.client.core.event.NodeMouseExitEvent;
+import com.ait.lienzo.client.core.event.NodeMouseExitHandler;
 import com.ait.lienzo.client.core.shape.Group;
 import com.ait.lienzo.client.core.shape.IContainer;
 import com.ait.lienzo.client.core.shape.IPrimitive;
@@ -283,6 +287,24 @@ public class WiresContainer
                 }
             }));
 
+            m_registrationManager.register(m_container.addNodeMouseEnterHandler(new NodeMouseEnterHandler()
+            {
+                @Override
+                public void onNodeMouseEnter(NodeMouseEnterEvent event)
+                {
+                    m_events.fireEvent(event);
+                }
+            }));
+
+            m_registrationManager.register(m_container.addNodeMouseExitHandler(new NodeMouseExitHandler()
+            {
+                @Override
+                public void onNodeMouseExit(NodeMouseExitEvent event)
+                {
+                    m_events.fireEvent(event);
+                }
+            }));
+
             m_container.setAttributesChangedBatcher(attributesChangedBatcher);
 
             final AttributesChangedHandler handler = new AttributesChangedHandler()
@@ -345,6 +367,18 @@ public class WiresContainer
 
         return m_events.addHandler(WiresDragEndEvent.TYPE, dragHandler);
 
+    }
+
+    public final HandlerRegistration addNodeMouseEnterHandler(final NodeMouseEnterHandler moveEnterHandler)
+    {
+        Objects.requireNonNull(moveEnterHandler);
+        return m_events.addHandler(NodeMouseEnterEvent.getType(), moveEnterHandler);
+    }
+
+    public final HandlerRegistration addNodeMouseExitHandler(final NodeMouseExitHandler moveExitHandler)
+    {
+        Objects.requireNonNull(moveExitHandler);
+        return m_events.addHandler(NodeMouseExitEvent.getType(), moveExitHandler);
     }
 
     public void destroy()

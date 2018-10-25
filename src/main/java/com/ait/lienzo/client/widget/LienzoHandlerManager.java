@@ -45,6 +45,7 @@ import com.ait.lienzo.client.core.event.NodeTouchMoveEvent;
 import com.ait.lienzo.client.core.event.NodeTouchStartEvent;
 import com.ait.lienzo.client.core.event.TouchPoint;
 import com.ait.lienzo.client.core.mediator.Mediators;
+import com.ait.lienzo.client.core.shape.Group;
 import com.ait.lienzo.client.core.shape.IPrimitive;
 import com.ait.lienzo.client.core.shape.Node;
 import com.ait.lienzo.client.core.shape.Shape;
@@ -54,6 +55,7 @@ import com.ait.lienzo.shared.core.types.EventPropagationMode;
 import com.ait.tooling.common.api.java.util.function.Predicate;
 import com.ait.tooling.nativetools.client.collection.NFastArrayList;
 import com.ait.tooling.nativetools.client.event.HandlerRegistrationManager;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NativeEvent;
@@ -800,14 +802,30 @@ final class LienzoHandlerManager
             {
                 if (prim != m_over_prim)
                 {
-                    if (m_over_prim.isEventHandled(NodeMouseExitEvent.getType()))
+                    boolean isChild = false;
+                    IPrimitive<?> parentOfShape = prim.getParent().asPrimitive();
+
+                    while (parentOfShape != null && !isChild)
+                    {
+                        for (IPrimitive<?> primitive : ((Group) parentOfShape).getChildNodes())
+                        {
+                            if (isChild = m_over_prim == primitive)
+                            {
+                                break;
+                            }
+                        }
+                        parentOfShape = parentOfShape.getParent().asPrimitive();
+                    }
+                    if (!isChild && m_over_prim.isEventHandled(NodeMouseExitEvent.getType()))
                     {
                         if (event instanceof AbstractNodeHumanInputEvent)
                         {
+                            GWT.log("Fired first");
                             m_over_prim.fireEvent(new NodeMouseExitEvent(((AbstractNodeHumanInputEvent<MouseEvent<?>, ?>) event).getHumanInputEvent(), x, y));
                         }
                         else
                         {
+                            GWT.log("Fired second");
                             m_over_prim.fireEvent(new NodeMouseExitEvent(null, x, y));
                         }
                     }
@@ -889,7 +907,7 @@ final class LienzoHandlerManager
             doDragCancel(event);
         }
         doCancelEnterExitShape(event);
-
+        GWT.log("mouse out triggered");
         fireEvent(event.getNodeEvent());
     }
 
