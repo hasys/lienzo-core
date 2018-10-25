@@ -244,6 +244,9 @@ public class WiresConnectorHandlerImpl implements WiresConnectorHandler {
     }
 
     private boolean isSelected() {
+        if (getWiresManager().getSelectionManager().getSelectedItems() == null) {
+            return false;
+        }
         return getWiresManager().getSelectionManager().getSelectedItems().getConnectors().contains(getConnector());
     }
 
