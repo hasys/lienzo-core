@@ -769,18 +769,61 @@ final class LienzoHandlerManager
     @SuppressWarnings("unchecked")
     private final void doCancelEnterExitShape(final INodeXYEvent event)
     {
-        if ((null != m_over_prim) && (m_over_prim.isEventHandled(NodeMouseExitEvent.getType())))
+        if (null != m_over_prim)
         {
-            if (event instanceof AbstractNodeHumanInputEvent)
+
+            if (m_over_prim.isEventHandled(NodeMouseExitEvent.getType()))
             {
-                m_over_prim.fireEvent(new NodeMouseExitEvent(((AbstractNodeHumanInputEvent<MouseEvent<?>, ?>) event).getHumanInputEvent(), event.getX(), event.getY()));
+                fireExitEvent(event, m_over_prim);
             }
-            else
-            {
-                m_over_prim.fireEvent(new NodeMouseExitEvent(null, event.getX(), event.getY()));
-            }
+
+            fireExitEventFromParents(event, m_over_prim);
         }
         m_over_prim = null;
+    }
+
+    private void fireExitEventFromParents(INodeXYEvent event, IPrimitive<?> primitive) {
+        Node<?> n = primitive.getParent();
+        while (null != n)
+        {
+            if (n instanceof Group)
+            {
+                for (IPrimitive<?> p : ((Group) n).getChildNodes())
+                {
+                    if (null != p && p.isEventHandled(NodeMouseExitEvent.getType()))
+                    {
+                        fireExitEvent(event, p);
+                    }
+                }
+            }
+            n = n.getParent();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private final void fireExitEvent(final INodeXYEvent event, IPrimitive<?> primitive)
+    {
+        if (event instanceof AbstractNodeHumanInputEvent)
+        {
+            primitive.fireEvent(new NodeMouseExitEvent(((AbstractNodeHumanInputEvent<MouseEvent<?>, ?>) event).getHumanInputEvent(), event.getX(), event.getY()));
+        }
+        else
+        {
+            primitive.fireEvent(new NodeMouseExitEvent(null, event.getX(), event.getY()));
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private final void fireEnterEvent(final INodeXYEvent event, IPrimitive<?> primitive)
+    {
+        if (event instanceof AbstractNodeHumanInputEvent)
+        {
+            primitive.fireEvent(new NodeMouseEnterEvent(((AbstractNodeHumanInputEvent<MouseEvent<?>, ?>) event).getHumanInputEvent(), event.getX(), event.getY()));
+        }
+        else
+        {
+            primitive.fireEvent(new NodeMouseEnterEvent(null, event.getX(), event.getY()));
+        }
     }
 
     // This will also return the shape under the cursor, for some optimization on Mouse Move
@@ -802,33 +845,18 @@ final class LienzoHandlerManager
             {
                 if (prim != m_over_prim)
                 {
-                    boolean isChild = false;
-                    Node<?> shape1 = prim.getParent();
-                    IPrimitive<?> parentOfShape = (null != shape1) ? shape1.asPrimitive() : null;
+                    boolean isChild = isChild(prim, m_over_prim);
+                    if (!isChild)
+                    {
+                        if (m_over_prim.isEventHandled(NodeMouseExitEvent.getType()))
+                        {
+                            fireExitEvent(event, m_over_prim);
+                        }
 
-                    while (parentOfShape != null && !isChild)
-                    {
-                        for (IPrimitive<?> primitive : ((Group) parentOfShape).getChildNodes())
+                        // Do not trigger Exit Event for parents if you moving from grandchild to child
+                        if (!isChild(m_over_prim, prim))
                         {
-                            if (isChild = m_over_prim == primitive)
-                            {
-                                break;
-                            }
-                        }
-                        shape1 = parentOfShape.getParent();
-                        parentOfShape = (null != shape1) ? shape1.asPrimitive() : null;
-                    }
-                    if (!isChild && m_over_prim.isEventHandled(NodeMouseExitEvent.getType()))
-                    {
-                        if (event instanceof AbstractNodeHumanInputEvent)
-                        {
-                            GWT.log("Fired first");
-                            m_over_prim.fireEvent(new NodeMouseExitEvent(((AbstractNodeHumanInputEvent<MouseEvent<?>, ?>) event).getHumanInputEvent(), x, y));
-                        }
-                        else
-                        {
-                            GWT.log("Fired second");
-                            m_over_prim.fireEvent(new NodeMouseExitEvent(null, x, y));
+                            fireExitEventFromParents(event, m_over_prim);
                         }
                     }
                 }
@@ -853,14 +881,7 @@ final class LienzoHandlerManager
                 }
                 if (!isChild && prim.isEventHandled(NodeMouseEnterEvent.getType()))
                 {
-                    if (event instanceof AbstractNodeHumanInputEvent)
-                    {
-                        prim.fireEvent(new NodeMouseEnterEvent(((AbstractNodeHumanInputEvent<MouseEvent<?>, ?>) event).getHumanInputEvent(), x, y));
-                    }
-                    else
-                    {
-                        prim.fireEvent(new NodeMouseEnterEvent(null, x, y));
-                    }
+                    fireEnterEvent(event, prim);
                 }
                 m_over_prim = prim;
             }
@@ -870,6 +891,26 @@ final class LienzoHandlerManager
             doCancelEnterExitShape(event);
         }
         return shape;
+    }
+
+    private boolean isChild(IPrimitive<?> possibleChild, IPrimitive<?> possibleParent) {
+        boolean isChild = false;
+        Node<?> shape1 = possibleChild.getParent();
+        IPrimitive<?> parentOfShape = (null != shape1) ? shape1.asPrimitive() : null;
+
+        while (parentOfShape != null && !isChild)
+        {
+            for (IPrimitive<?> primitive : ((Group) parentOfShape).getChildNodes())
+            {
+                if (isChild = possibleParent == primitive)
+                {
+                    break;
+                }
+            }
+            shape1 = parentOfShape.getParent();
+            parentOfShape = (null != shape1) ? shape1.asPrimitive() : null;
+        }
+        return isChild;
     }
 
     private final void onNodeMouseMove(final INodeXYEvent event)
