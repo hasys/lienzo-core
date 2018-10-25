@@ -803,7 +803,8 @@ final class LienzoHandlerManager
                 if (prim != m_over_prim)
                 {
                     boolean isChild = false;
-                    IPrimitive<?> parentOfShape = prim.getParent().asPrimitive();
+                    Node<?> shape1 = prim.getParent();
+                    IPrimitive<?> parentOfShape = (null != shape1) ? shape1.asPrimitive() : null;
 
                     while (parentOfShape != null && !isChild)
                     {
@@ -814,7 +815,8 @@ final class LienzoHandlerManager
                                 break;
                             }
                         }
-                        parentOfShape = parentOfShape.getParent().asPrimitive();
+                        shape1 = parentOfShape.getParent();
+                        parentOfShape = (null != shape1) ? shape1.asPrimitive() : null;
                     }
                     if (!isChild && m_over_prim.isEventHandled(NodeMouseExitEvent.getType()))
                     {
@@ -833,7 +835,23 @@ final class LienzoHandlerManager
             }
             if (prim != m_over_prim)
             {
-                if ((null != prim) && (prim.isEventHandled(NodeMouseEnterEvent.getType())))
+                boolean isChild = false;
+                if (null != m_over_prim)
+                {
+                    Node<?> shape1 = m_over_prim.getParent();
+                    IPrimitive<?> parentOfShape = (null != shape1) ? shape1.asPrimitive() : null;
+
+                    while (parentOfShape != null && !isChild) {
+                        for (IPrimitive<?> primitive : ((Group) parentOfShape).getChildNodes()) {
+                            if (isChild = prim == primitive) {
+                                break;
+                            }
+                        }
+                        shape1 = parentOfShape.getParent();
+                        parentOfShape = (null != shape1) ? shape1.asPrimitive() : null;
+                    }
+                }
+                if (!isChild && prim.isEventHandled(NodeMouseEnterEvent.getType()))
                 {
                     if (event instanceof AbstractNodeHumanInputEvent)
                     {
