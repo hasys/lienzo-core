@@ -777,22 +777,29 @@ final class LienzoHandlerManager
                 fireExitEvent(event, m_over_prim);
             }
 
-            fireExitEventForParents(event, m_over_prim);
+            fireExitEventForParents(event, m_over_prim, null);
         }
         m_over_prim = null;
     }
 
-    private void fireExitEventForParents(INodeXYEvent event, IPrimitive<?> primitive) {
-        Node<?> n = primitive.getParent();
+    private void fireExitEventForParents(INodeXYEvent event, IPrimitive<?> from, IPrimitive<?> to) {
+        Node<?> n = from.getParent();
         while (null != n)
         {
             if (n instanceof Group)
             {
+                if (n.asPrimitive().isEventHandled(NodeMouseExitEvent.getType()))
+                {
+                    fireExitEvent(event, n.asPrimitive());
+                }
                 for (IPrimitive<?> p : ((Group) n).getChildNodes())
                 {
                     if (null != p && p.isEventHandled(NodeMouseExitEvent.getType()))
                     {
-                        fireExitEvent(event, p);
+                        if (!isChild(to, p))
+                        {
+                            fireExitEvent(event, p);
+                        }
                     }
                 }
             }
@@ -856,7 +863,7 @@ final class LienzoHandlerManager
                         // Do not trigger Exit Event for parents if you moving from grandchild to child
                         if (!isChild(m_over_prim, prim))
                         {
-                            fireExitEventForParents(event, m_over_prim);
+                            fireExitEventForParents(event, m_over_prim, prim);
                         }
                     }
                 }
@@ -904,9 +911,13 @@ final class LienzoHandlerManager
         {
             if (n instanceof Group)
             {
+                if (n.asPrimitive().isEventHandled(NodeMouseEnterEvent.getType()))
+                {
+                    fireEnterEvent(event, n.asPrimitive());
+                }
                 for (IPrimitive<?> p : ((Group) n).getChildNodes())
                 {
-                    if (null != p && p.isEventHandled(NodeMouseExitEvent.getType()))
+                    if (null != p && p.isEventHandled(NodeMouseEnterEvent.getType()))
                     {
                         if (!isChild(from, p))
                         {
