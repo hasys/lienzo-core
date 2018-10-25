@@ -777,12 +777,12 @@ final class LienzoHandlerManager
                 fireExitEvent(event, m_over_prim);
             }
 
-            fireExitEventFromParents(event, m_over_prim);
+            fireExitEventForParents(event, m_over_prim);
         }
         m_over_prim = null;
     }
 
-    private void fireExitEventFromParents(INodeXYEvent event, IPrimitive<?> primitive) {
+    private void fireExitEventForParents(INodeXYEvent event, IPrimitive<?> primitive) {
         Node<?> n = primitive.getParent();
         while (null != n)
         {
@@ -856,7 +856,7 @@ final class LienzoHandlerManager
                         // Do not trigger Exit Event for parents if you moving from grandchild to child
                         if (!isChild(m_over_prim, prim))
                         {
-                            fireExitEventFromParents(event, m_over_prim);
+                            fireExitEventForParents(event, m_over_prim);
                         }
                     }
                 }
@@ -879,9 +879,14 @@ final class LienzoHandlerManager
                         parentOfShape = (null != shape1) ? shape1.asPrimitive() : null;
                     }
                 }
-                if (!isChild && prim.isEventHandled(NodeMouseEnterEvent.getType()))
+                if (!isChild)
                 {
-                    fireEnterEvent(event, prim);
+                    if (prim.isEventHandled(NodeMouseEnterEvent.getType()))
+                    {
+                        fireEnterEvent(event, prim);
+                    }
+
+                    fireEnterEventForParents(event, prim, m_over_prim);
                 }
                 m_over_prim = prim;
             }
@@ -893,7 +898,34 @@ final class LienzoHandlerManager
         return shape;
     }
 
+    private void fireEnterEventForParents(INodeXYEvent event, IPrimitive<?> to, IPrimitive<?> from) {
+        Node<?> n = to.getParent();
+        while (null != n)
+        {
+            if (n instanceof Group)
+            {
+                for (IPrimitive<?> p : ((Group) n).getChildNodes())
+                {
+                    if (null != p && p.isEventHandled(NodeMouseExitEvent.getType()))
+                    {
+                        if (!isChild(from, p))
+                        {
+                            fireEnterEvent(event, p);
+                        }
+                    }
+                }
+            }
+            n = n.getParent();
+        }
+    }
+
+
     private boolean isChild(IPrimitive<?> possibleChild, IPrimitive<?> possibleParent) {
+        if (null == possibleChild || null == possibleParent)
+        {
+            return false;
+        }
+
         boolean isChild = false;
         Node<?> shape1 = possibleChild.getParent();
         IPrimitive<?> parentOfShape = (null != shape1) ? shape1.asPrimitive() : null;
