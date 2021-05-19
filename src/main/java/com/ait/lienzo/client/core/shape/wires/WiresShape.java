@@ -160,6 +160,8 @@ public class WiresShape extends WiresContainer
      */
     public void refresh()
     {
+        boolean isVisible = null != getControls() && getControls().isVisible();
+
         destroyControls();
 
         _loadControls(IControlHandle.ControlHandleStandardType.RESIZE);
@@ -167,6 +169,9 @@ public class WiresShape extends WiresContainer
         if (null != getControls())
         {
             getControls().refresh();
+            if (isVisible) {
+                getControls().show();
+            }
         }
     }
 
