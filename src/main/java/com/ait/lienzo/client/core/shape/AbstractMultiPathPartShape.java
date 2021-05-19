@@ -67,8 +67,8 @@ import com.google.gwt.json.client.JSONObject;
 
 public abstract class AbstractMultiPathPartShape<T extends AbstractMultiPathPartShape<T>> extends Shape<T>
 {
-    public static final ColorName CONTROL_POINT_ACTIVE_FILL = ColorName.DARKRED;
-    public static final ColorName CONTROL_POINT_DRAG_FILL   = ColorName.GREEN;
+    public static final String CONTROL_POINT_ACTIVE_FILL = "#0088CE";
+    public static final ColorName CONTROL_POINT_DRAG_FILL   = ColorName.WHITE;
 
     private final NFastArrayList<PathPartList> m_points = new NFastArrayList<PathPartList>();
     private NFastArrayList<PathPartList> m_cornerPoints = new NFastArrayList<PathPartList>();
@@ -579,7 +579,7 @@ public abstract class AbstractMultiPathPartShape<T extends AbstractMultiPathPart
 
         public static Circle getControlPrimitive(final double size, final double x, final double y, final Shape<?> shape, final DragMode dragMode)
         {
-            return new Circle(size).setX(x + shape.getX()).setY(y + shape.getY()).setFillColor(CONTROL_POINT_ACTIVE_FILL).setFillAlpha(0.8).setStrokeColor(ColorName.BLACK).setStrokeWidth(0.5).setDraggable(true).setDragMode(dragMode);
+            return new Circle(size).setX(x + shape.getX()).setY(y + shape.getY()).setFillColor(CONTROL_POINT_ACTIVE_FILL).setFillAlpha(0.95).setStrokeColor(CONTROL_POINT_DRAG_FILL).setStrokeWidth(2).setDraggable(true).setDragMode(dragMode);
         }
     }
 
@@ -689,6 +689,8 @@ public abstract class AbstractMultiPathPartShape<T extends AbstractMultiPathPart
             if ((m_handle.isActive()) && (m_chlist.isActive()))
             {
                 m_prim.setFillColor(CONTROL_POINT_DRAG_FILL);
+                m_prim.setStrokeColor(CONTROL_POINT_ACTIVE_FILL);
+                m_prim.setFillAlpha(1);
 
                 m_prim.getLayer().draw();
             }
@@ -1032,6 +1034,8 @@ public abstract class AbstractMultiPathPartShape<T extends AbstractMultiPathPart
             if ((m_handle.isActive()) && (m_chlist.isActive()))
             {
                 m_prim.setFillColor(CONTROL_POINT_DRAG_FILL);
+                m_prim.setStrokeColor(CONTROL_POINT_ACTIVE_FILL);
+                m_prim.setFillAlpha(1);
 
                 m_prim.getLayer().draw();
             }

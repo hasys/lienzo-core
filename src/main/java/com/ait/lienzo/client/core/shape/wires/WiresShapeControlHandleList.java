@@ -30,6 +30,8 @@ import com.ait.lienzo.client.core.event.NodeDragStartEvent;
 import com.ait.lienzo.client.core.event.NodeDragStartHandler;
 import com.ait.lienzo.client.core.event.NodeMouseClickEvent;
 import com.ait.lienzo.client.core.event.NodeMouseClickHandler;
+import com.ait.lienzo.client.core.event.NodeMouseDoubleClickEvent;
+import com.ait.lienzo.client.core.event.NodeMouseDoubleClickHandler;
 import com.ait.lienzo.client.core.shape.Group;
 import com.ait.lienzo.client.core.shape.IPrimitive;
 import com.ait.lienzo.client.core.shape.MultiPath;
@@ -220,6 +222,13 @@ public class WiresShapeControlHandleList implements IControlHandleList
                 m_registrationManager.register(control.addNodeMouseClickHandler(new NodeMouseClickHandler() {
                     @Override
                     public void onNodeMouseClick(NodeMouseClickEvent event) {
+                        show();
+                    }
+                }));
+
+                m_registrationManager.register(control.addNodeMouseDoubleClickHandler(new NodeMouseDoubleClickHandler() {
+                    @Override
+                    public void onNodeMouseDoubleClick(NodeMouseDoubleClickEvent event) {
                         show();
                     }
                 }));
