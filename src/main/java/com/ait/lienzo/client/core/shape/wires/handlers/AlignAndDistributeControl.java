@@ -25,6 +25,8 @@ public interface AlignAndDistributeControl {
 
     boolean dragAdjust(Point2D dxy);
 
+    boolean dragAdjust(Point2D dxy, double width, double height);
+
     void remove();
 
     Set<AlignAndDistribute.DistributionEntry> getHorizontalDistributionEntries();

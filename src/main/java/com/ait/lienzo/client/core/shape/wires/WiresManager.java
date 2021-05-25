@@ -24,6 +24,8 @@ import com.ait.lienzo.client.core.shape.wires.event.WiresResizeEndEvent;
 import com.ait.lienzo.client.core.shape.wires.event.WiresResizeEndHandler;
 import com.ait.lienzo.client.core.shape.wires.event.WiresResizeStartEvent;
 import com.ait.lienzo.client.core.shape.wires.event.WiresResizeStartHandler;
+import com.ait.lienzo.client.core.shape.wires.event.WiresResizeStepEvent;
+import com.ait.lienzo.client.core.shape.wires.event.WiresResizeStepHandler;
 import com.ait.lienzo.client.core.shape.wires.handlers.AlignAndDistributeControl;
 import com.ait.lienzo.client.core.shape.wires.handlers.WiresConnectorControl;
 import com.ait.lienzo.client.core.shape.wires.handlers.WiresConnectorHandler;
@@ -38,7 +40,6 @@ import com.ait.lienzo.client.core.types.OnLayerBeforeDraw;
 import com.ait.lienzo.client.core.types.Point2D;
 import com.ait.lienzo.client.widget.DragConstraintEnforcer;
 import com.ait.lienzo.client.widget.DragContext;
-import com.ait.tooling.common.api.java.util.function.Supplier;
 import com.ait.tooling.nativetools.client.collection.NFastArrayList;
 import com.ait.tooling.nativetools.client.collection.NFastStringMap;
 import com.ait.tooling.nativetools.client.event.HandlerRegistrationManager;
@@ -251,6 +252,13 @@ public final class WiresManager
             public void onShapeResizeEnd(WiresResizeEndEvent event)
             {
                 alignAndDistrControl.dragEnd();
+            }
+        }));
+
+        registrationManager.register(shape.addWiresResizeStepHandler(new WiresResizeStepHandler() {
+            @Override
+            public void onShapeResizeStep(WiresResizeStepEvent event) {
+                alignAndDistrControl.dragAdjust(new Point2D(event.getX(), event.getY()), event.getWidth(), event.getHeight());
             }
         }));
     }

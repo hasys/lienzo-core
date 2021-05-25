@@ -575,6 +575,24 @@ public class AlignAndDistributeControlImpl implements AlignAndDistributeControl
         double top = m_startTop + dxy.getY();
         double width = m_box.getWidth();
         double height = m_box.getHeight();
+        return drawAlignAndDistribute(dxy, left, top, width, height);
+    }
+
+    @Override
+    public boolean dragAdjust(Point2D dxy, double width, double height)
+    {
+        if (!isIndexed())
+        {
+            // ignore adjustment if indexing is off
+            return false;
+        }
+
+        double left = m_startLeft + dxy.getX();
+        double top = m_startTop + dxy.getY();
+        return drawAlignAndDistribute(dxy, left, top, width, height);
+    }
+
+    private boolean drawAlignAndDistribute(final Point2D dxy, final double left, final double top, final double width, final double height) {
         capturePositions(left, left + width, top, top + height);
 
         AlignAndDistribute.AlignAndDistributeMatches matches = m_alignAndDistribute.findNearestMatches(this, m_left, m_hCenter, m_right, m_top, m_vCenter, m_bottom);
@@ -658,11 +676,6 @@ public class AlignAndDistributeControlImpl implements AlignAndDistributeControl
             // it was adjusted, so recapture points
             if (recapture)
             {
-                // can't use the original left and top vars, as they are before adjustment snap
-                left = m_startLeft + dxy.getX();
-                top = m_startTop + dxy.getY();
-                width = m_box.getWidth();
-                height = m_box.getHeight();
                 capturePositions(left, left + width, top, top + height);
             }
         }
