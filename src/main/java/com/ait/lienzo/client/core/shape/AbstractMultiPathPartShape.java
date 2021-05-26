@@ -48,6 +48,7 @@ import com.ait.lienzo.client.core.shape.wires.IControlHandle.ControlHandleType;
 import com.ait.lienzo.client.core.shape.wires.IControlHandleFactory;
 import com.ait.lienzo.client.core.shape.wires.IControlHandleList;
 import com.ait.lienzo.client.core.shape.wires.WiresShapeControlHandleList;
+import com.ait.lienzo.client.core.shape.wires.decorator.PointHandleDecorator;
 import com.ait.lienzo.client.core.types.BoundingBox;
 import com.ait.lienzo.client.core.types.PathPartEntryJSO;
 import com.ait.lienzo.client.core.types.PathPartList;
@@ -67,9 +68,6 @@ import com.google.gwt.json.client.JSONObject;
 
 public abstract class AbstractMultiPathPartShape<T extends AbstractMultiPathPartShape<T>> extends Shape<T>
 {
-    public static final String CONTROL_POINT_ACTIVE_FILL = "#0088CE";
-    public static final ColorName CONTROL_POINT_DRAG_FILL   = ColorName.WHITE;
-
     private final NFastArrayList<PathPartList> m_points = new NFastArrayList<PathPartList>();
     private NFastArrayList<PathPartList> m_cornerPoints = new NFastArrayList<PathPartList>();
 
@@ -579,7 +577,15 @@ public abstract class AbstractMultiPathPartShape<T extends AbstractMultiPathPart
 
         public static Circle getControlPrimitive(final double size, final double x, final double y, final Shape<?> shape, final DragMode dragMode)
         {
-            return new Circle(size).setX(x + shape.getX()).setY(y + shape.getY()).setFillColor(CONTROL_POINT_ACTIVE_FILL).setFillAlpha(0.95).setStrokeColor(CONTROL_POINT_DRAG_FILL).setStrokeWidth(2).setDraggable(true).setDragMode(dragMode);
+            return new Circle(size)
+                    .setX(x + shape.getX())
+                    .setY(y + shape.getY())
+                    .setFillColor(PointHandleDecorator.MAIN_COLOR)
+                    .setFillAlpha(PointHandleDecorator.VALID_FILL_ALPHA)
+                    .setStrokeColor(PointHandleDecorator.STROKE_COLOR)
+                    .setStrokeWidth(PointHandleDecorator.VALID_STROKE_WIDTH)
+                    .setDraggable(true)
+                    .setDragMode(dragMode);
         }
     }
 
@@ -688,9 +694,10 @@ public abstract class AbstractMultiPathPartShape<T extends AbstractMultiPathPart
 
             if ((m_handle.isActive()) && (m_chlist.isActive()))
             {
-                m_prim.setFillColor(CONTROL_POINT_DRAG_FILL);
-                m_prim.setStrokeColor(CONTROL_POINT_ACTIVE_FILL);
-                m_prim.setFillAlpha(1);
+                // Set reversed colors
+                m_prim.setFillColor(PointHandleDecorator.STROKE_COLOR);
+                m_prim.setStrokeColor(PointHandleDecorator.MAIN_COLOR);
+                m_prim.setFillAlpha(PointHandleDecorator.INVALID_FILL_ALPHA);
 
                 m_prim.getLayer().draw();
             }
@@ -747,7 +754,7 @@ public abstract class AbstractMultiPathPartShape<T extends AbstractMultiPathPart
                     list.resetBoundingBox();
                 }
                 m_shape.resetBoundingBox();
-                m_prim.setFillColor(CONTROL_POINT_ACTIVE_FILL);
+                m_prim.setFillColor(PointHandleDecorator.MAIN_COLOR);
 
                 m_prim.getLayer().draw();
             }
@@ -1033,9 +1040,10 @@ public abstract class AbstractMultiPathPartShape<T extends AbstractMultiPathPart
 
             if ((m_handle.isActive()) && (m_chlist.isActive()))
             {
-                m_prim.setFillColor(CONTROL_POINT_DRAG_FILL);
-                m_prim.setStrokeColor(CONTROL_POINT_ACTIVE_FILL);
-                m_prim.setFillAlpha(1);
+                // Set inverted colors
+                m_prim.setFillColor(PointHandleDecorator.STROKE_COLOR);
+                m_prim.setStrokeColor(PointHandleDecorator.MAIN_COLOR);
+                m_prim.setFillAlpha(PointHandleDecorator.INVALID_STROKE_ALPHA);
 
                 m_prim.getLayer().draw();
             }
@@ -1249,7 +1257,7 @@ public abstract class AbstractMultiPathPartShape<T extends AbstractMultiPathPart
 
                 }
                 m_shape.resetBoundingBox();
-                m_prim.setFillColor(CONTROL_POINT_ACTIVE_FILL);
+                m_prim.setFillColor(PointHandleDecorator.MAIN_COLOR);
 
                 m_prim.getLayer().draw();
             }

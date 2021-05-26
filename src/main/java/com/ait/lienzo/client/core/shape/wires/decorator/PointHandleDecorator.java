@@ -18,28 +18,39 @@ package com.ait.lienzo.client.core.shape.wires.decorator;
 
 import com.ait.lienzo.client.core.shape.Shape;
 import com.ait.lienzo.client.core.shape.wires.WiresConnector;
-import com.ait.lienzo.shared.core.types.ColorName;
 
 /**
  * Changes the style of connector point handles {@link WiresConnector#getPointHandles()} shapes, according to a given {@link ShapeState}.
  */
 public class PointHandleDecorator implements IShapeDecorator<Shape<?>> {
 
-    public static final String MAIN_COLOR = ColorName.DARKRED.getHexColor();
+    public static final String MAIN_COLOR = "#0088CE";
+    public static final String STROKE_COLOR = "#FFFFFF";
+    public static final double VALID_FILL_ALPHA = 0.8;
+    public static final int VALID_STROKE_WIDTH = 2;
+    public static final double VALID_STROKE_ALPHA = 1;
+    public static final double INVALID_FILL_ALPHA = 1;
+    public static final int INVALID_STROKE_WIDTH = 2;
+    public static final double INVALID_STROKE_ALPHA = 1;
 
     @Override
     public Shape decorate(Shape shape, ShapeState state) {
         switch (state) {
             case NONE:
             case VALID:
-                shape.moveToTop()
-                        .setFillColor(MAIN_COLOR)
-                        .setFillAlpha(0.8)
-                        .setStrokeAlpha(0);
+                shape.setFillColor(MAIN_COLOR)
+                        .setFillAlpha(VALID_FILL_ALPHA)
+                        .setStrokeAlpha(VALID_STROKE_ALPHA)
+                        .setStrokeWidth(VALID_STROKE_WIDTH)
+                        .setStrokeColor(STROKE_COLOR);
                 break;
             case INVALID:
-                shape.moveToTop()
-                        .setFillColor(ColorName.GREEN);
+                // Reversed Main and Stroke colors
+                shape.setFillColor(STROKE_COLOR)
+                        .setFillAlpha(INVALID_FILL_ALPHA)
+                        .setStrokeAlpha(INVALID_STROKE_ALPHA)
+                        .setStrokeWidth(INVALID_STROKE_WIDTH)
+                        .setStrokeColor(MAIN_COLOR);
                 break;
         }
         return shape;

@@ -47,9 +47,9 @@ import com.ait.lienzo.client.core.shape.wires.IControlHandle.ControlHandleStanda
 import com.ait.lienzo.client.core.shape.wires.IControlHandle.ControlHandleType;
 import com.ait.lienzo.client.core.shape.wires.IControlHandleFactory;
 import com.ait.lienzo.client.core.shape.wires.IControlHandleList;
+import com.ait.lienzo.client.core.shape.wires.decorator.PointHandleDecorator;
 import com.ait.lienzo.client.core.types.PathPartList;
 import com.ait.lienzo.client.core.types.Point2D;
-import com.ait.lienzo.shared.core.types.ColorName;
 import com.ait.lienzo.shared.core.types.DragMode;
 import com.ait.lienzo.shared.core.types.ShapeType;
 import com.ait.tooling.nativetools.client.event.HandlerRegistrationManager;
@@ -192,7 +192,14 @@ public abstract class AbstractMultiPointShape<T extends AbstractMultiPointShape<
             {
                 final Point2D p = point;
 
-                final Circle prim = new Circle(R0).setX(m_shape.getX() + p.getX()).setY(m_shape.getY() + p.getY()).setFillColor(ColorName.DARKRED).setFillAlpha(0.8).setStrokeAlpha(0).setDraggable(true).setDragMode(m_dmode);
+                final Circle prim = new Circle(R0)
+                        .setX(m_shape.getX() + p.getX())
+                        .setY(m_shape.getY() + p.getY())
+                        .setFillColor(PointHandleDecorator.MAIN_COLOR)
+                        .setFillAlpha(PointHandleDecorator.VALID_FILL_ALPHA)
+                        .setStrokeAlpha(0)
+                        .setDraggable(true)
+                        .setDragMode(m_dmode);
 
                 prim.setSelectionStrokeOffset(SELECTION_OFFSET);
                 prim.setSelectionBoundsOffset(SELECTION_OFFSET);
@@ -358,7 +365,7 @@ public abstract class AbstractMultiPointShape<T extends AbstractMultiPointShape<
 
             if ((m_handle.isActive()) && (m_handleList.isActive()))
             {
-                m_prim.setFillColor(ColorName.GREEN);
+                m_prim.setFillColor(PointHandleDecorator.STROKE_COLOR);
 
                 m_prim.getLayer().batch();
             }
@@ -371,7 +378,7 @@ public abstract class AbstractMultiPointShape<T extends AbstractMultiPointShape<
 
             if ((m_handle.isActive()) && (m_handleList.isActive()))
             {
-                m_prim.setFillColor(ColorName.DARKRED);
+                m_prim.setFillColor(PointHandleDecorator.MAIN_COLOR);
 
                 m_prim.getLayer().batch();
             }
