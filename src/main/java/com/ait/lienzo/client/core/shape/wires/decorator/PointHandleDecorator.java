@@ -35,6 +35,10 @@ public class PointHandleDecorator implements IShapeDecorator<Shape<?>> {
 
     @Override
     public Shape decorate(Shape shape, ShapeState state) {
+        return decorateShape(shape, state);
+    }
+
+    public static <T extends Shape> T decorateShape(T shape, ShapeState state) {
         switch (state) {
             case NONE:
             case VALID:

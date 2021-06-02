@@ -162,16 +162,17 @@ public class WiresShape extends WiresContainer
     {
         boolean isVisible = null != getControls() && getControls().isVisible();
 
-        destroyControls();
+        if (!isVisible) {
+            destroyControls();
 
-        _loadControls(IControlHandle.ControlHandleStandardType.RESIZE);
+            _loadControls(IControlHandle.ControlHandleStandardType.RESIZE);
+
+            getControls().refresh();
+        }
 
         if (null != getControls())
         {
             getControls().refresh();
-            if (isVisible) {
-                getControls().show();
-            }
         }
     }
 
@@ -230,7 +231,6 @@ public class WiresShape extends WiresContainer
                                                   public void onShapeResizeEnd(WiresResizeEndEvent event) {
                                                       handler.onShapeResizeEnd(event);
                                                       m_innerLayoutContainer.refresh();
-                                                      refresh();
                                                   }
                                               });
     }
