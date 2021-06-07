@@ -258,7 +258,16 @@ public final class WiresManager
         registrationManager.register(shape.addWiresResizeStepHandler(new WiresResizeStepHandler() {
             @Override
             public void onShapeResizeStep(WiresResizeStepEvent event) {
-                alignAndDistrControl.dragAdjust(new Point2D(event.getX(), event.getY()), event.getWidth(), event.getHeight());
+                Point2D point = new Point2D(event.getX(), event.getY());
+                alignAndDistrControl.dragAdjust(point, event.getWidth(), event.getHeight());
+                /*
+                UNCOMMENT IT TO ENABLE BUGGY SNAP FOR RESIZE
+
+                shape.getPath().setX(point.getX());
+                shape.getPath().setY(point.getY());
+                shape.refresh();
+
+                 */
             }
         }));
     }

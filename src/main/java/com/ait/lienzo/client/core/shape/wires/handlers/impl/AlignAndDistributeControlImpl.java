@@ -676,7 +676,12 @@ public class AlignAndDistributeControlImpl implements AlignAndDistributeControl
             // it was adjusted, so recapture points
             if (recapture)
             {
-                capturePositions(left, left + width, top, top + height);
+                // can't use the original left and top vars, as they are before adjustment snap
+                double m_left = m_startLeft + dxy.getX();
+                double m_top = m_startTop + dxy.getY();
+                double m_width = m_box.getWidth();
+                double m_height = m_box.getHeight();
+                capturePositions(m_left, m_left + m_width, m_top, m_top + m_height);
             }
         }
 
