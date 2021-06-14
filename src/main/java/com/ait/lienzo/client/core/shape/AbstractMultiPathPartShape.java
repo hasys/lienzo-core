@@ -750,7 +750,7 @@ public abstract class AbstractMultiPathPartShape<T extends AbstractMultiPathPart
                 {
                     list.resetBoundingBox();
                 }
-
+                m_shape.resetBoundingBox();
                 PointHandleDecorator.decorateShape(m_prim, VALID);
 
                 m_prim.getLayer().draw();

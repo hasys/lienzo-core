@@ -38,6 +38,7 @@ import com.ait.lienzo.client.core.types.BoundingBox;
 import com.ait.lienzo.client.core.types.Point2D;
 import com.ait.lienzo.shared.core.types.EventPropagationMode;
 import com.ait.tooling.nativetools.client.event.HandlerRegistrationManager;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.event.shared.HandlerRegistration;
 
@@ -231,6 +232,10 @@ public class WiresShape extends WiresContainer
                                                   public void onShapeResizeEnd(WiresResizeEndEvent event) {
                                                       handler.onShapeResizeEnd(event);
                                                       m_innerLayoutContainer.refresh();
+                                                      GWT.log("I am herere");
+                                                      getControls().updateParentLocation();
+                                                      getControl().getMagnetsControl().shapeChanged();
+                                                      getControls().refresh();
                                                   }
                                               });
     }

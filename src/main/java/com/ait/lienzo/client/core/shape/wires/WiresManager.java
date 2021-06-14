@@ -260,14 +260,6 @@ public final class WiresManager
             public void onShapeResizeStep(WiresResizeStepEvent event) {
                 Point2D point = new Point2D(event.getX(), event.getY());
                 alignAndDistrControl.dragAdjust(point, event.getWidth(), event.getHeight());
-                /*
-                UNCOMMENT IT TO ENABLE BUGGY SNAP FOR RESIZE
-
-                shape.getPath().setX(point.getX());
-                shape.getPath().setY(point.getY());
-                shape.refresh();
-
-                 */
             }
         }));
     }
